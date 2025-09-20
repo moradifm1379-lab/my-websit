@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="utf-8" />
+  <title>عینک مجازی سینا</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+
+  <script src="dist/JeelizVTOWidget.js"></script>
+  <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet" />
+  <link rel="stylesheet" href="css/JeelizVTOWidget.css" />
+
+  <style>
+    /* ---------- top-bar background ---------- */
+    .header {
+      background-color: #65C39C;
+      color: #fff;
+      padding: 10px 0;
+    }
+
+    /* ---------- مدل‌های عینک - سمت راست ---------- */
+    #modelsPanel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 8px;
+      border: 2px solid #65C39C;
+      box-shadow: 0 4px 10px rgba(0,0,0,.2);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 180px;
+    }
+
+    #modelsPanel button,
+    #modelsPanel select {
+      width: 100%;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 8px;
+      border-radius: 6px;
+      border: 2px solid #65C39C;
+      background: #fff;
+      color: #333;
+      cursor: pointer;
+      transition: background .3s;
+    }
+    #modelsPanel button:hover,
+    #modelsPanel select:hover {
+      background: #e6f5f0;
+    }
+
+    .twoButtons {
+      display: flex;
+      gap: 6px;
+    }
+    .twoButtons button {
+      flex: 1;
+    }
+  </style>
+
+  <script>
+    let _isResized = false;
+
+    function test_resizeCanvas() {
+      const halfHeightPx = Math.round(window.innerHeight / 2) + "px";
+      const domWidget = document.getElementById("JeelizVTOWidget");
+      domWidget.style.maxHeight = _isResized ? "none" : halfHeightPx;
+      _isResized = !_isResized;
+    }
+
+    function get_initialSKU() {
+      const params = new URLSearchParams(window.location.search);
+      const sku = params.get("sku") || "rayban_aviator_or_vertFlash";
+      console.log("Initial SKU =", sku);
+      return sku;
+    }
+
+    function get_isShadow() {
+      const params = new URLSearchParams(window.location.search);
+      return !params.has("isHideShadow");
+    }
+
+    function loadSelectedModel() {
+      const selector = document.getElementById("moreModels");
+      const val = selector.value;
+      if (val === "custom") {
+        const sku = prompt("لطفاً کد SKU مدل سینا را وارد کنید:");
+        if (sku) JEELIZVTOWIDGET.load(sku);
+        else selector.selectedIndex = 0;
+      } else if (val) {
+        JEELIZVTOWIDGET.load(val);
+      }
+    }
+
+    function main() {
+      JEELIZVTOWIDGET.start({
+        isShadow: get_isShadow(),
+        sku: get_initialSKU(),
+        searchImageMask: "https://appstatic.jeeliz.com/jeewidget/images/1757147097074.jpg",
+        searchImageColor: 0xeeeeee,
+        callbackReady: () => console.log("INFO: عینک مجازی سینا آماده است ✅"),
+        onError: (err) => alert("⚠️ متأسفیم! مشکلی در اجرای عینک مجازی سینا رخ داد. (کد خطا: " + err + ")")
+      });
+    }
+
+    window.addEventListener("load", main);
+  </script>
+</head>
+
+<body>
+  <div class="content">
+    <!-- هدر -->
+    <div class="header">
+      <div class="headerTitle">
+        <img src="images/logo.png" alt="لوگوی سینا" style="height:40px; vertical-align:middle; margin-left:10px;" />
+        عینک مجازی سینا
+      </div>
+    </div>
+
+    <!-- ویجت اصلی -->
+    <div id="JeelizVTOWidget" class="JeelizVTOWidget">
+      <canvas id="JeelizVTOWidgetCanvas" class="JeelizVTOWidgetCanvas"></canvas>
+
+      <!-- کنترل‌های بالا -->
+      <div class="JeelizVTOWidgetControls JeelizVTOWidgetControlsTop">
+        <button id="JeelizVTOWidgetAdjust" class="JeelizVTOWidgetButton">
+          <div class="buttonIcon"><i class="fas fa-arrows-alt"></i></div>
+          تنظیم موقعیت
+        </button>
+        <button id="buttonResizeCanvas" class="JeelizVTOWidgetButton" onclick="test_resizeCanvas();">
+          <div class="buttonIcon"><i class="fas fa-sync-alt"></i></div>
+          تغییر اندازه
+        </button>
+      </div>
+
+      <!-- پیام تنظیم -->
+      <div id="JeelizVTOWidgetAdjustNotice" class="JeelizVTOWidgetAdjustNotice">
+        لطفاً موقعیت عینک سینا را روی صورت خود تنظیم کنید.
+        <button id="JeelizVTOWidgetAdjustExit" class="JeelizVTOWidgetBottomButton">بازگشت</button>
+      </div>
+
+      <!-- پیام بارگذاری -->
+      <div id="JeelizVTOWidgetLoading" class="JeelizVTOWidgetLoading">
+        <div class="JeelizVTOWidgetLoadingText">⏳ لطفاً صبر کنید، عینک‌های سینا در حال آماده‌سازی هستند...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- مدل‌های عینک - سمت راست -->
+  <div id="modelsPanel">
+    <button disabled style="cursor:default; opacity:1;">مدل‌های عینک</button>
+
+    <div class="twoButtons">
+      <button onclick="JEELIZVTOWIDGET.load('rayban_aviator_or_vertFlash')">مدل کلاسیک</button>
+      <button onclick="JEELIZVTOWIDGET.load('rayban_round_cuivre_pinkBrownDegrade')">مدل مدرن</button>
+    </div>
+<select id="moreModels" onchange="loadSelectedModel()">
+    <option value="" selected>انتخاب مدل‌های بیشتر</option>
+    <!-- Ray-Ban -->
+    <optgroup label="Ray-Ban">
+        <option value="rayban_aviator_or_vertFlash">Ray Ban RB3025 Aviator Gold/Green</option>
+        <option value="rayban_wayfarer_havane_vert">Ray-Ban Original Wayfarer Tortoise Crystal Brown Polarized</option>
+        <option value="rayban_wayfarer_denimOrange_orangeDegrade">Ray-Ban RB2140 Orange Jeans w/Orange Gradient</option>
+        <option value="rayban_round_gun_vert">A-Roval Women Polarized Bardian Large Fashion</option>
+        <option value="rayban_aviator_gun_vert">Trendy Semi Rimless Gradient Temple</option>
+        <option value="rayban_aviator_or_vert">Wsunglass W925 Men/Women 58mm</option>
+        <option value="rayban_round_cuivre_pinkBrownDegrade">Ray-Ban RB3447</option>
+        <option value="rayban_erika_marronArgent_marronVioletDegrade">Ray-Ban Women’s RB4171 Brown 54mm</option>
+        <option value="rayban_clubround_noir_cuivre_flash">Ray-Ban Clubround Black/Brown Mirror Pink</option>
+        <option value="rayban_cockpit_or_vert_classique">Ray-Ban Cockpit RB3362 Arista/Green</option>
+        <option value="rayban_justin_noir_rougeMirroir">Ray-Ban RB4165 Rubber Black/Brown Mirror Orange</option>
+        <option value="rayban_clubround_noir_vertClassique_g15">Ray-Ban Clubround Black/Green 51mm</option>
+        <option value="rayban_boyfriend_noir_marronDegrade">Ray-Ban RB4147 Black/Dark Brown Gradient</option>
+        <option value="rayban_justin_marron_vertDegrade">Ray-Ban RB4165 Justin Brown/Green Gradient</option>
+        <option value="rayban_round_or_vert">Round Vintage Mirror UV400</option>
+        <option value="rayban_justin_noir_bleuMirroir">Ray-Ban Justin Black/Green Mirror Blue</option>
+        <option value="rayban_clubround_havaneNoir_vertClassique_g15">Ray-Ban RB4246 Spotted Black Havana/Green</option>
+        <option value="rayban_boyfriend_havane_marron_clair_degrade">Ray-Ban RB4147 Tortoise/Light Brown Gradient</option>
+        <option value="rayban_chris_gris_argent_argent_mirroir">Ray-Ban Highstreet Black/Red Transp./Grey</option>
+        <option value="rayban_new_wayfarer_havane_marron_clair_degrade">Ray-Ban New Wayfarer Light Havana 58mm</option>
+        <option value="rayban_predator_noir_gris_mirroir">Ray-Ban Predator 2 Black/Crystal Green Mirror</option>
+        <option value="rayban_chris_noir_gun_bleu_mirroir">Geometric Large Aviator Pixel/Clear</option>
+        <option value="rayban_wayfarer_denimNoir_bleuMirroir">Ray-Ban RB2140 Grey/Blue Acetate</option>
+        <option value="rayban_clubmaster_noir_bleuGris">Ray-Ban Clubmaster RB3016 Polarized</option>
+        <option value="rayban_wayfarer_denimBleuClair_bleuDegrade">Ray-Ban RB2140 Blue/Grey Denim</option>
+        <option value="rayban_justin_gris_argentDegrade">Ray-Ban RB4165 Rubber Grey/Silver Mirror Gradient</option>
+        <option value="rayban_new_wayfarer_havane_marronClassique_g15">Ray-Ban RB2132 Havana/Crystal Brown Gradient</option>
+        <option value="rayban_predator_noir_vert_classique">Ray-Ban Predator 2 Black/Crystal Green</option>
+        <option value="rayban_chris_havane_gun_vert_classique">Ray-Ban 4187 Tortoise/Green</option>
+        <option value="rayban_doubleBridge_bleu_gradient_flash">Ray-Ban RB3647N Gold/Blue Flash</option>
+        <option value="rayban_andy_violet_violet_mirroir">Ray-Ban RB4387 Dark Tortoise/Brown</option>
+        <option value="rayban_caravan_bronze_cuivre_bleu_miroir">Ray-Ban RB3136 Bronze Matte/Blue</option>
+        <option value="rayban_wayfarer_havane_marron">Ray-Ban RB2140 Tortoise 50mm</option>
+        <option value="rayban_clubmaster_havane_vert">Ray-Ban RB3016 Polarized Havana/Green</option>
+        <option value="rayban_wayfarer_noir_vert">Ray-Ban RB2140 Spotted Blue Havana</option>
+        <option value="rayban_clubmaster_noir_marronDegrade">Ray-Ban Clubmaster Mock Tortoise/Green</option>
+        <option value="rayban_round_doubleBridge_argent_gradient_flash">Ray-Ban Round Double Bridge Silver/Flash</option>
+        <option value="rayban_andy_bleu_bleu_mirroir">Ray-Ban Andy Matte Blue/Blue Mirror</option>
+        <option value="rayban_caravan_bronze_cuivre_lilas_mirroir">Ray-Ban RB3136 Bronze Copper/Purple Mirror</option>
+        <option value="rayban_round_doubleBridge_or_marron_classique_b15">Ray-Ban RB3647N Gold/Brown Classic</option>
+        <option value="rayban_andy_noir_vert_classique">Ray-Ban Andy Matte Black/Dark Green</option>
+        <option value="rayban_chris_noir_argent_gris_degrade">Ray-Ban Chris Rubber Black/Grey Gradient</option>
+        <option value="rayban_round_or_marronClairDegrade">Ray-Ban RB3447 Matte Gold/Clear Brown Gradient</option>
+        <option value="rayban_justin_violet_violetMirroir">Ray-Ban RB4165 Pink/Category 2 Mirror</option>
+        <option value="rayban_clubround_havaneNoir_marronClassique_b15">Ray-Ban RB4246 Spotted Brown Havana/Brown</option>
+        <option value="rayban_boyfriend_noir_gris_classique">Ray-Ban RB4147 Black/Red Dark Grey</option>
+        <option value="rayban_chris_bleu_argent_bleu_clair_degrade">Ray-Ban RB4187 Shiny Blue Mirror</option>
+        <option value="rayban_erika_havaneGun_marronDegrade">Ray-Ban Erika Havana Gun/Brown Gradient</option>
+        <option value="rayban_clubround_bleu_argent_flash">Ray-Ban RB4246 Wrinkled Blue/Black Silver Flash</option>
+        <option value="rayban_boyfriend_havane_gris_degrade_mirroir">Ray-Ban RB4147 Matte Tortoise/Grey Mirror</option>
+        <option value="rayban_justin_noir_bleu">Ray-Ban RB4165 Rubber Black/Polarized Blue</option>
+        <option value="rayban_new_wayfarer_noir_gris_bleu_degrade">Ray-Ban RB2132 Black/Grey Blue Gradient</option>
+        <option value="rayban_boyfriend_havane_marron_classique">Ray-Ban RB4147 710/57 Havana/Brown</option>
+        <option value="rayban_chris_noir_gun_argent_mirroir">Ray-Ban Chris Black/Green Mirror Silver</option>
+        <option value="rayban_wayfarer_biColorNoirJaune_jauneFlash">Ray-Ban Wayfarer Black/Yellow Flash</option>
+        <option value="rayban_justin_havane_gris">Ray-Ban RB4165 Rubber Havana/Grey</option>
+        <option value="rayban_new_wayfarer_havane_bleu_vert_degrade">Konalla Cat Eye Flash Lens C2</option>
+        <option value="rayban_boyfriend_noir_gris_clair_degrade">Ray-Ban RB4147 Black/Light Grey Gradient</option>
+        <option value="rayban_chris_orange_argent_rouge_mirroir">Ray-Ban Chris Metallic Copper/Red Mirror</option>
+        <option value="rayban_wayfarer_biColorNoirVert_vertFlash">Ray-Ban Wayfarer Black/Green Mirror</option>
+        <option value="rayban_justin_noir_vert">Sport Wrap Black/Blue-Green</option>
+        <option value="rayban_clubround_havane_vertClassique_g15">Ray-Ban Clubround Red Havana/Green</option>
+        <option value="rayban_clubmaster_havane_marronDegrade">Ray-Ban Clubmaster Havana/Brown Gradient</option>
+        <option value="rayban_round_doubleBridge_cuivre_gradient_flash">Ray-Ban RB3647N Copper/Gradient Flash</option>
+        <option value="rayban_andy_havane_argent_flash">Ray-Ban Andy Tortoise/Silver Flash</option>
+        <option value="rayban_caravan_bronze_cuivre_violet_mirroir">Ray-Ban Caravan Brushed Bronze/Purple</option>
+        <option value="rayban_wayfarer_havane_marronClairDegrade">Ray-Ban RB2140 Tortoise/Crystal Brown</option>
+        <option value="rayban_justin_noir_grisDegrade">Ray-Ban Justin Black/Grey Gradient</option>
+        <option value="rayban_new_wayfarer_havane_vertClassique_g15">Ray-Ban New Wayfarer Tortoise/Green</option>
+        <option value="rayban_andy_havane_bleu_flash">Ray-Ban Andy Havana/Blue Flash</option>
+        <option value="rayban_chris_noir_gris_degrade">Ray-Ban Chris Black/Grey Gradient</option>
+        <option value="rayban_wayfarer_noir_grisClairDegrade">Ray-Ban Wayfarer Black/Light Grey</option>
+        <option value="rayban_justin_havane_marronDegrade">Ray-Ban Justin Havana/Brown Gradient</option>
+        <option value="rayban_new_wayfarer_noir_vertClassique_g15">Ray-Ban New Wayfarer Black/Green</option>
+        <option value="rayban_caravan_or_vert_classique">Ray-Ban Caravan Gold/Green</option>
+        <option value="rayban_aviator_or_orangeFlash">Ray-Ban Aviator Gold/Orange Mirror</option>
+        <option value="rayban_clubmasterFleck_havaneNoir_vert">Ray-Ban Clubmaster Fleck Havana/Green</option>
+        <option value="rayban_round_doubleBridge_or_vert_classique_g15">Ray-Ban Round Double Bridge Gold/Green</option>
+        <option value="rayban_andy_noir_bleu_mirroir">Ray-Ban Andy Black/Blue Mirror</option>
+        <option value="rayban_caravan_or_vert_flash">Ray-Ban Caravan Gold/Green Mirror</option>
+        <option value="rayban_aviator_gun_argentFlash">Ray-Ban Aviator Gunmetal/Silver Flash</option>
+        <option value="rayban_clubmaster_havaneNoir_bleuGris">Ray-Ban Clubmaster Blue Havana/Grey</option>
+        <option value="rayban_round_doubleBridge_noir_vert_classique_g15">Ray-Ban Round Double Bridge Black/Green</option>
+        <option value="rayban_andy_marron_clair_vert_mirroir">Ray-Ban Andy Light Brown/Green Mirror</option>
+        <option value="rayban_caravan_gun_vert_classique_2">Ray-Ban Caravan Gunmetal/Green</option>
+        <option value="rayban_aviator_cuivre_bleuMirroir">Ray-Ban Aviator Copper/Blue Mirror</option>
+        <option value="rayban_clubmaster_noir_grisDegrade">Ray-Ban Clubmaster Black/Grey Gradient</option>
+        <option value="rayban_round_doubleBridge_noir_bleu_gris_classique">Ray-Ban Round Double Bridge Black/Blue-Grey</option>
+        <option value="rayban_andy_marron_marron_degrade">Ray-Ban Andy Brown/Brown Gradient</option>
+        <option value="rayban_caravan_argent_argent_flash">Ray-Ban Caravan Silver/Silver Flash</option>
+        <option value="rayban_andy_havane_orange_flash">Ray-Ban Andy Tortoise/Orange Flash</option>
+        <option value="rayban_chris_havane_marron_degrade">Ray-Ban Chris Havana/Brown Gradient</option>
+        <option value="rayban_boyfriend_noir_vert_classique">Ray-Ban Boyfriend Black/Green</option>
+        <option value="rayban_chris_bleu_bleu_clair_degrade">Ray-Ban Chris Blue/Light Blue Gradient</option>
+        <option value="rayban_round_noir_bleuClairDegrade">Ray-Ban Round Matte Black/Light Blue</option>
+        <option value="rayban_erika_noir_grisDegrade">Ray-Ban Erika Black/Grey Gradient</option>
+        <option value="rayban_clubround_blanc_vert_mirroir">Ray-Ban Clubround White/Green Mirror</option>
+        <option value="rayban_boyfriend_noir_gris_degrade">Ray-Ban Boyfriend Black/Grey Gradient</option>
+        <option value="rayban_chris_violet_gun_gris_degrade">Ray-Ban Chris Violet/Grey Gradient</option>
+        <option value="rayban_round_cuivre_vertDegrade">Ray-Ban Round Copper/Green Gradient</option>
+        <option value="rayban_aviator_gun_gris">Ray-Ban Aviator Gunmetal/Grey</option>
+        <option value="rayban_clubmaster_noir_vert">Ray-Ban Clubmaster Black/Green</option>
+        <option value="rayban_erika_or_marronDegrade">Ray-Ban Erika Gold/Brown Gradient</option>
+        <option value="rayban_justin_noir_grisGradient_55mm">Ray-Ban Justin Rubber Black/Grey Gradient 55mm Non-Polarized</option>
+        <option value="rayban_new_wayfarer_havane_crystalGreen_52mm">Ray-Ban New Wayfarer Tortoise/Crystal Green 52mm Non-Polarized</option>
+        <option value="rayban_andy_havane_flashGrey">Ray-Ban Unisex 0RB4202 Andy 55mm Havana/Flash Grey Polarized</option>
+        <option value="rayban_chris_noir_lightGreyGradient_54mm">Ray-Ban Chris Rubber Black/Light Grey Gradient Dark Grey 54mm Non-Polarized</option>
+        <option value="rayban_wayfarer_noir_901_50mm">Ray-Ban RB2140 901 Sunglasses Black 50-22-150</option>
+        <option value="rayban_justin_havane_greenGradient_51mm">Ray-Ban Justin Rubber Brown on Grey/Green Gradient 51mm Non-Polarized</option>
+        <option value="rayban_new_wayfarer_noir_square_58mm">Ray-Ban Women's New Wayfarer Square Sunglasses Black 58mm</option>
+        <option value="rayban_caravan_arista_crystalGreen_58mm">Ray-Ban Caravan Arista/Crystal Green 58mm Non-Polarized</option>
+        <option value="rayban_aviator_or_redOrangeMirror_58mm">Ray-Ban Aviator Luxottica Red Orange Mirror Gold Frame RB3025 112/69 58mm</option>
+        <option value="rayban_clubmaster_spottedBlackHavana_green_51mm">Ray-Ban RB3016 1157 51M Spotted Black Havana/Green</option>
+        <option value="rayban_round_doubleBridge_or_iridium_51mm">Ray-Ban 0RB3647N Non-Polarized Iridium Round Sunglasses Gold 51mm</option>
+        <option value="rayban_andy_tortoise_brown_56mm">Ray-Ban Men's RB4387 Round Sunglasses Dark Tortoise/Brown 56mm</option>
+        <option value="rayban_caravan_matteGold_greyMirror_58mm">Ray-Ban RB3136 112/19 58M Matte Gold/Grey Mirror Green</option>
+        <option value="rayban_aviator_gunmetal_greenSilverMirror_58mm">Ray-Ban RB3025 029/30 58M Matte Gunmetal/Green Silver Mirror Aviator</option>
+        <option value="rayban_clubmaster_spottedBlueHavana_grey_51mm">Ray-Ban RB3016 1158R5 51M Spotted Blue Havana/Grey</option>
+        <!-- New Models Added -->
+        <option value="rayban_andy_marron_fireRedMirror_59mm">Revant Replacement Lenses for Ray-Ban RB4151 59mm Polarized Elite Fire Red MirrorShield</option>
+        <option value="rayban_caravan_gunmetal_whiteGreen_55mm">Ray-Ban Unisex RB3136 Caravan 5515 004 Sunglasses Gunmetal White/Green G-15xlt 55mm</option>
+        <option value="rayban_aviator_matteGold_blueMirror_55mm">Ray-Ban Original RB3025 112/17 Aviator Non-Polarized Sunglasses Matte Gold/Blue Mirror 55mm</option>
+        <option value="rayban_clubmaster_noir_crystalGreen_49mm">Ray-Ban Clubmaster Classic RB3016 W0365-49-21 Black/Crystal Green Solid</option>
+        <option value="rayban_andy_brown_gradient_55mm">Ray-Ban Andy RB4202 607313 Brown/Brown Gradient 55mm</option>
+        <option value="rayban_caravan_noir_polarizedGreen_62mm">Ray-Ban RB3364 Rectangular Metal Sunglasses Black/Polarized Green 62mm</option>
+        <option value="rayban_boyfriend_noir_brownGradient_60mm">Ray-Ban RB4147 Top Black on Brown/Brown Gradient Dark Brown 60mm Non-Polarized</option>
+        <option value="rayban_chris_opalViolet_greyGradient_55mm">Ray-Ban RB4198 Opal Violet/Gray Gradient 55mm</option>
+        <option value="rayban_aviator_gunmetal_polarizedGrey_58mm">Ray-Ban Aviator Large Metal RB3025 004/78 58 Gunmetal/Gray Polarized</option>
+        <option value="rayban_erika_havane_green_54mm">Ray-Ban RB4171 Erika Light Havana/Green 710/71 54mm</option>
+        <option value="rayban_ferrari_gris_noir_mirrorChromance">Ray-Ban Ferrari Black Grey Mirror Chromance</option>
+        <option value="rayban_cockpit_noir_orangeGradient_56mm">Ray-Ban RB3362 Cockpit Shiny Black/Orange Gradient Flash 56mm</option>
+        <option value="rayban_cockpit_matteGold_greyMirrorBlue_56mm">Ray-Ban Cockpit Matte Gold/Grey Mirror Blue 56mm Non-Polarized</option>
+        <option value="rayban_aviator_gold_brown_62mm">Ray-Ban RB3025 001/33 62M Gold/Brown Aviator</option>
+        <option value="rayban_round_cuivre_bleuMarronDegrade">Ray-Ban RB3447 Copper/Blue Brown Gradient</option>
+        <option value="rayban_ferrari_noir_vert_classique">Ray-Ban Ferrari Black Green Classic</option>
+        <option value="rayban_ferrari_noir_argent_mirrorChromance">Ray-Ban Ferrari Black Silver Mirror Chromance</option>
+        <option value="rayban_cockpit_gunmetal_green_58mm">Ray-Ban RB3362 Cockpit 004/58 Gunmetal/Green 58mm</option>
+        <option value="rayban_aviator_noir_green_58mm">Ray-Ban RB3025 L2823 58 Black/Green G-15 Lens</option>
+        <option value="rayban_round_gold_greenMirror_50mm">Ray-Ban RB3447 112/P9 50M Matte Gold/Green Mirror Polarized</option>
+        <option value="rayban_erika_noir_purpleMirror_54mm">Ray-Ban RB4171 601/5Q 54M Black/Polarized Purple</option>
+        <option value="rayban_ferrari_bleu_mirrorChromance">Ray-Ban Ferrari Blue Mirror Chromance</option>
+        <option value="rayban_cockpit_noir_greenGradient_56mm">Ray-Ban Cockpit Shiny Black/Green Gradient Flash 56mm</option>
+        <option value="rayban_aviator_gold_brownPink_58mm">Ray-Ban RB3025 001/3E Gold/Brown-Pink Silver Flash 58mm</option>
+        <option value="rayban_round_gold_brownMirrorPink_50mm">Ray-Ban RB3447 112/Z2 50mm Matte Gold/Brown Mirror Pink</option>
+        <option value="rayban_erika_noir_greenPolarized_54mm">Ray-Ban RB4171 601/2P 54M Black/Polarized Green</option>
+        <option value="rayban_ferrari_noir_goldMirrorChromance">Ray-Ban Ferrari Black Gold Mirror Chromance</option>
+        <option value="rayban_cockpit_noir_bleuGradient_59mm">Ray-Ban RB3362 002/4O 59M Shiny Black/Blue Gradient Flash</option>
+        <option value="rayban_round_gunmetal_greyGradient">Ray-Ban RB3447 Gunmetal/Grey Gradient</option>
+    </optgroup>
+     <optgroup label="Carrera">
+        <option value="carrera_118S_black_grey">Carrera 118/S Black/Grey GTN/P9</option>
+        <option value="carrera_118S_black_gold_grey">Carrera 118/S Black Gold Grey 118/S REW DX</option>
+        <option value="carrera_118S_havane_blue">Carrera 118/S Havana Blue T6L/8F</option>
+        <option value="carrera_118S_blue_grey_degrade">Carrera 118/S Blue Grey T6M HD</option>
+        <option value="carrera_118S_havane_marron">Carrera 118/S Havana Brown L2L/NR</option>
+        <option value="carrera_118S_black_green">Carrera 118/S Black Green GUY/D5</option>
+        <option value="carrera_113S_gold_green">Carrera 113/S Gold Green J5G UC</option>
+        <option value="carrera_113S_silver_silver_mirror">Carrera 113/S Silver 010 SS</option>
+        <option value="carrera_113S_blue">Carrera 113/S Blue D6K KU</option>
+        <option value="carrera_119S_havana_blue">Carrera 119/S Havana Blue T6L/8F</option>
+        <option value="carrera_114S_black_brown">Carrera 114/S Black Brown 003 70</option>
+        <option value="carrera_116s_black_blue">Carrera 116/S Black Blue RFB UY</option>
+        <option value="carrera_5029_black_green">Carrera 5029NS Black Green D28 D5</option>
+        <option value="carrera_6008_black_brown">Carrera 6008 Black Brown ANS 70</option>
+        <option value="carrera_113S_gold_black_red">Carrera 113/S Black Gold Red 1PW W6</option>
+        <option value="carrera_114S_blue_grey">Carrera 114/S Blue Grey D6K P9</option>
+        <option value="carrera_119S_blue_grey_gradient">Carrera 119/S Blue Grey T6M HD</option>
+        <option value="carrera_116s_black_brown_gradient">Carrera 116/S Black Brown RFB FI</option>
+        <option value="carrera_5029_havana_brown_gradient">Carrera 5029NS Havana Brown DWJ S1</option>
+        <option value="carrera_113S_gold_brown">Carrera 113/S Gold Brown 029Q D8</option>
+        <option value="carrera_119S_black_green">Carrera 119/S Black Green GUY/D5</option>
+        <option value="carrera_116s_black_grey_gradient">Carrera 116/S Black Grey 003 HD</option>
+        <option value="carrera_5003_havana_brown_flash">Carrera 5003 Havana Brown DDM 1L</option>
+        <option value="carrera_5029_havana_blue">Carrera 5029NS Havana Blue RFE 9A</option>
+        <option value="carrera_113S_gold_brown_gradient">Carrera 113/S Gold Brown 029Q D8</option>
+        <option value="carrera_119S_black_grey">Carrera 119/S Black Grey GTN/P9</option>
+        <option value="carrera_116s_black_brown">Carrera 116/S Black Brown 003 70</option>
+        <option value="carrera_5003_grey_grey_gradient">Carrera 5003 Grey DDL JJ</option>
+        <option value="carrera_114S_black_grey_gradient">Carrera 114/S Black Grey 003 HD</option>
+        <option value="carrera_119S_havana_brown">Carrera 119/S Havana Brown L2L/NR</option>
+        <option value="carrera_116s_blue_grey">Carrera 116/S Blue Grey D6K P9</option>
+        <option value="carrera_5003_bleu_gris_flash">Carrera 5003 Blue Grey DDN/9Y</option>
+        <option value="carrera_6008_havane_green">Carrera 6008 Havana Green 100 DJ</option>
+    </optgroup>
+      <!-- Oakley -->
+    <optgroup label="Oakley">
+        <option value="frogskins_black_brown">Oakley Frogskins Black Brown 9013</option>
+        <option value="flak_black_blue">Oakley Flak Black Blue 9188</option>
+        <option value="flak_white_blue">Oakley Flak White Blue 918820</option>
+        <option value="latch_havana_green">Oakley Latch Havana Green 9265</option>
+        <option value="frogskins_black_gray">Oakley Frogskins Black Grey 9245-01</option>
+        <option value="flak_white_orange">Oakley Flak White Orange 9188</option>
+        <option value="frogskins_transparent_blue">Oakley Frogskins Transparent Blue 9013</option>
+        <option value="flak_black_gray">Oakley Flak Black Grey 9188</option>
+        <option value="frogskins_green_brown">Oakley Frogskins Green Brown 9013</option>
+        <option value="latch_black_gray">Oakley Latch Black Grey 9265 01</option>
+        <option value="latch_black_blue">Oakley Latch Black Blue 9265 30</option>
+        <option value="holbrook_black_gray">Oakley Holbrook Black Grey 9102 02</option>
+        <option value="catalyst_black_orange">Oakley Catalyst Black Orange 9272 04</option>
+        <option value="catalyst_black_red">Oakley Catalyst Black Red 9272 07</option>
+        <option value="catalyst_black_yellow_gray">Oakley Catalyst Black Yellow Grey 9272 17</option>
+        <option value="holbrook_black_bright_blue">Oakley Holbrook Black Bright Blue 9102 22</option>
+        <option value="holbrook_black_purple">Oakley Holbrook Black Purple 9102 26</option>
+        <option value="latch_black_orange">Oakley Latch Black Orange 9265 29</option>
+        <option value="catalyst_gray_silver">Oakley Catalyst Grey Silver 9272 03</option>
+        <option value="holbrook_black_blue">Oakley Holbrook Black Blue 9102 52</option>
+        <option value="oakley_radar_path_black_silver">Oakley Radar Path Black Silver 9208-5238</option>
+        <option value="oakley_m2_black_gray">Oakley M2 Black Grey 9343-09</option>
+        <option value="oakley_jawbreak_black_pink">Oakley Jawbreaker Black Pink 9290-08</option>
+        <option value="oakley_radar_path_black_orange">Oakley Radar Path Black Orange 9208-19</option>
+        <option value="oakley_radar_path_black_blue_pink">Oakley Radar Path Black Pink Blue</option>
+        <option value="oakley_jawbreak_black_silver">Oakley Jawbreaker Black Silver 9290-1931</option>
+        <option value="oakley_jawbreak_black_gray">Oakley Jawbreaker Black Grey 9290-01</option>
+        <option value="oakley_radar_path_black_pink">Oakley Radar Path Black Pink 9275-11</option>
+        <option value="oakley_m2_black_white_orange">Oakley M2 Blanc White 9343-05</option>
+        <option value="oakley_jawbreak_white_pink">Oakley Jawbreaker White Pink 9290-2731</option>
+        <option value="oakley_m2_black_red_pink">Oakley M2 Red Pink 9343-1145</option>
+    </optgroup>
+    <!-- AliExpress -->
+    <optgroup label="AliExpress">
+        <option value="aliexpress_cateye01_black_red">Cat Eye Style (Black & Red)</option>
+        <option value="aliexpress_cateye01_gold_silver">Cat Eye Style (Gold & Silver)</option>
+        <option value="aliexpress_thuglife_green">Thug Life (Blue Green)</option>
+        <option value="aliexpress_steampunk_gold_blue_mirror">Steampunk (Gold & Blue)</option>
+        <option value="aliexpress_steampunk_silver_silver">Steampunk (Silver)</option>
+        <option value="aliexpress_steampunk_brass_gold">Steampunk (Brass & Gold)</option>
+        <option value="aliexpress_wayfarer_style_brown_brown">Wayfarer Style (Brown)</option>
+        <option value="aliexpress_wayfarer_style_black_gold">Wayfarer Style (Black & Gold)</option>
+        <option value="aliexpress_clubmaster_style_black_silver_clear">Clubmaster Style (Black & Clear)</option>
+        <option value="aliexpress_clubmaster_style_white_brown">Clubmaster Style (White & Brown)</option>
+        <option value="aliexpress_cateye02_black_black">Cat Eye Style (Black & Grey)</option>
+        <option value="aliexpress_polarsnow_black_silver">Polarsnow (Black & Grey)</option>
+        <option value="aliexpress_veithdia_yellow">Veithdia (Gold & Grey)</option>
+        <option value="aliexpress_cateye01_black_gray">Cat Eye Style (Black & Grey)</option>
+        <option value="aliexpress_thuglife_blue">Thug Life (Blue)</option>
+        <option value="aliexpress_steampunk_gold_pink">Steampunk (Gold & Pink)</option>
+        <option value="aliexpress_steampunk_silver_black">Steampunk (Silver & Grey)</option>
+        <option value="aliexpress_steampunk_black_black">Steampunk (Black & Grey)</option>
+        <option value="aliexpress_wayfarer_style_black_green">Wayfarer Style (Black & Green)</option>
+        <option value="aliexpress_wayfarer_style_transparent_orange">Wayfarer Style (Transparent & Orange)</option>
+        <option value="aliexpress_clubmaster_style_black_silver_blue">Clubmaster Style (Black & Blue)</option>
+        <option value="aliexpress_clubmaster_style_havane_brown">Clubmaster Style (Havana & Marron)</option>
+        <option value="aliexpress_clubmaster_style_havane_gold_brown">Clubmaster Style (Dark Havana & Brown)</option>
+        <option value="aliexpress_cateye02_gold_brown">Cat Eye Style (Gold & Brown)</option>
+        <option value="aliexpress_veithdia_gray">Veithdia (Grey)</option>
+        <option value="aliexpress_cateye01_black_blue">Cat Eye Style (Black & Blue)</option>
+        <option value="aliexpress_thuglife_yellow">Thug Life (Yellow)</option>
+        <option value="aliexpress_steampunk_gold_black">Steampunk (Gold & Grey)</option>
+        <option value="aliexpress_steampunk_gold_orange">Steampunk (Gold & Orange)</option>
+        <option value="aliexpress_steampunk_black_red">Steampunk (Black & Red)</option>
+        <option value="aliexpress_wayfarer_style_black_blue">Wayfarer Style (Black & Blue)</option>
+        <option value="aliexpress_wayfarer_style_black_silver">Wayfarer Style (Black & Silver)</option>
+        <option value="aliexpress_clubmaster_style_black_gold_gray">Clubmaster Style (Black & Grey)</option>
+        <option value="aliexpress_clubmaster_style_cyan_silver_gray">Clubmaster Style (Cyan & Purple)</option>
+        <option value="aliexpress_clubmaster_style_black_green_blue">Clubmaster Style (Black & Green / Blue)</option>
+        <option value="aliexpress_cateye02_gold_blue">Cat Eye Style (Gold & Blue)</option>
+        <option value="aliexpress_veithdia_gold">Veithdia (Gold & Grey)</option>
+        <option value="aliexpress_cateye01_gold_gray">Cat Eye Style (Gold & Grey)</option>
+        <option value="aliexpress_cateye01_silver_silver">Cat Eye Style (Silver)</option>
+        <option value="aliexpress_thuglife_silver">Thug Life (Silver)</option>
+        <option value="aliexpress_steampunk_gold_green_mirror">Steampunk (Gold & Blue / Green)</option>
+        <option value="aliexpress_steampunk_silver_red">Steampunk (Silver & Red)</option>
+        <option value="aliexpress_steampunk_brass_brown">Steampunk (Brass & Brown)</option>
+        <option value="aliexpress_wayfarer_style_black_orange">Wayfarer Style (Black & Orange)</option>
+        <option value="aliexpress_clubmaster_style_gold_black">Clubmaster Style (Black & Gris)</option>
+        <option value="aliexpress_clubmaster_style_havane_gold_clear">Clubmaster Style (Havana & Clear)</option>
+        <option value="aliexpress_clubmaster_style_black_green">Clubmaster Style (Black & Green)</option>
+        <option value="aliexpress_cateye02_gold_black">Cat Eye Style (Gold & Black)</option>
+        <option value="aliexpress_veithdia_black">Veithdia (Black & Grey)</option>
+        <option value="aliexpress_veithdia_silver">Veithdia (Grey & Silver)</option>
+        <option value="aliexpress_steampunk_gold_red">Steampunk (Gold & Red)</option>
+        <option value="aliexpress_steampunk_silver_blue_mirror">Steampunk (Silver & Blue)</option>
+        <option value="aliexpress_thuglife_gray_black">Thug Life (Gray)</option>
+        <option value="aliexpress_cateye01_gold_pink">Cat Eye Style (Gold & Pink)</option>
+        <option value="aliexpress_wayfarer_style_black_black">Wayfarer Style (Black & Grey)</option>
+        <option value="aliexpress_clubmaster_style_silver_black">Clubmaster Style (Black & Grey)</option>
+        <option value="aliexpress_wayfarer_style_mat_black_black">Wayfarer Style (Matt Black & Grey)</option>
+        <option value="aliexpress_steampunk_gold_clear">Steampunk (Gold & Clear)</option>
+        <option value="aliexpress_clubmaster_style_black_orange">Clubmaster Style (Black & Orange)</option>
+        <option value="aliexpress_clubmaster_style_havane_clear">Clubmaster Style (Havana & Clear)</option>
+        <option value="aliexpress_cateye02_gold_pink">Cat Eye Style (Gold & Pink)</option>
+        <option value="aliexpress_veithdia_blue">Veithdia (Black & Blue)</option>
+    </optgroup>
+    <!-- Mykita -->
+    <optgroup label="Mykita">
+        <option value="mykita_black">Mykita Aviator Doug N01</option>
+        <option value="mykita_black_bronze_gradient">Mykita Aviator Doug N01</option>
+        <option value="mykita_black_gold_green">Mykita Aviator Doug N01</option>
+    </optgroup>
+    <!-- Persol -->
+    <optgroup label="Persol">
+        <option value="persol_PO0649_havana_green">Persol Havana Green 0649</option>
+        <option value="persol_PO0649_havana_brown">Persol Havana Brown 0649</option>
+        <option value="persol_PO3105S_havana_blue">Persol Havana Blue 3105S</option>
+        <option value="persol_PO0714_havana_blue">Persol Havana Blue 0714</option>
+        <option value="persol_PO0649_havana_blue">Persol Havana Blue 0649</option>
+        <option value="persol_PO3105S_havana_green">Persol Havana Green 3105S</option>
+        <option value="persol_PO3105S_black_green">Persol Black Green 3105S</option>
+        <option value="persol_PO0714_havana_green">Persol Havana Green 0714</option>
+        <option value="persol_PO0714_havana_brown">Persol Havana Brown 0714</option>
+    </optgroup>
+    <!-- Thierry Lasry -->
+    <optgroup label="Thierry Lasry">
+        <option value="thierry_lasry_black_grey">Thierry Lasry Lively Black Brown</option>
+    </optgroup>
+    <!-- Stella McCartney -->
+    <optgroup label="Stella McCartney">
+        <option value="smcc_SC0021S_black_hite">Stella McCartney Black White</option>
+        <option value="smcc_SC0025S_pink_brown">Stella McCartney Pink Brown SC0025S</option>
+    </optgroup>
+    <!-- Dior -->
+    <optgroup label="Dior">
+        <option value="dior_black_gold">Dior Murmure Black Gold</option>
+    </optgroup>
+    <!-- Prada -->
+    <optgroup label="Prada">
+        <option value="prada_black_gold">Prada Black Gold PR 01OS</option>
+    </optgroup>
+    <!-- Gucci -->
+    <optgroup label="Gucci">
+        <option value="gucci_black_havana">Gucci Black Havana Grey</option>
+        <option value="gucci_havana_green">Gucci Havana Green</option>
+    </optgroup>
+    <!-- Burberry -->
+    <optgroup label="Burberry">
+        <option value="burberry_brown">Burberry Brown Gold</option>
+    </optgroup>
+    <!-- Polaroid -->
+    <optgroup label="Polaroid">
+        <option value="polaroid_6003_blue_grey">Polaroid 6003 Blue Grey</option>
+        <option value="polaroid_6003_black_grey">Polaroid 6003 Black Grey</option>
+        <option value="polaroid_1013_black_grey">Polaroid 1013 Black Grey</option>
+        <option value="polaroid_6009_black_gold">Polaroid 6009 Black Gold</option>
+        <option value="polaroid_4005_havana_grey">Polaroid 4005 Havana Grey</option>
+        <option value="polaroid_6003_havana_brown">Polaroid 6003 Havana Brown</option>
+        <option value="polaroid_4023_black_green">Polaroid 4023 Black Green</option>
+        <option value="polaroid_7009_black_yellow_grey">Polaroid 7009 Black Yellow Grey</option>
+        <option value="polaroid_1013_havana_green">Polaroid 1013 Havana Green</option>
+        <option value="polaroid_6016_red_grey">Polaroid 6016 Red Grey</option>
+        <option value="polaroid_6016_blue_grey">Polaroid 6016 Blue Grey</option>
+        <option value="polaroid_7009_black_red_grey">Polaroid 7009 Black Red Grey</option>
+        <option value="polaroid_7009_black_grey">Polaroid 7009 Black Grey</option>
+        <option value="polaroid_6009_black_blue">Polaroid 6009 Black Blue</option>
+        <option value="polaroid_4005_black_grey">Polaroid 4005 Black Grey</option>
+        <option value="polaroid_4023_havana_brown">Polaroid 4023 Havana Brown</option>
+        <option value="polaroid_4023_black_grey">Polaroid 4023 Black Grey</option>
+        <option value="polaroid_6009_havana_orange">Polaroid 6009 Havana Orange</option>
+        <option value="polaroid_6016_black_grey">Polaroid 6016 Black Grey</option>
+    </optgroup>
+</select>
+</body>
+</html>
